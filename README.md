@@ -1,11 +1,12 @@
 # llm-static-analysis
 
-Running the experiment
+First download and filter the data
+```
+make data 
+```
+
+Then run the experiment
 ```
 make experiment
 ```
 
-Making the data
-```
-make data 
-```
