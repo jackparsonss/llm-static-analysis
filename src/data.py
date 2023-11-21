@@ -41,7 +41,9 @@ def filter(row):
 
 
 def filter_data():
-    ds = datasets.load_dataset("thepurpleowl/codequeries", "twostep")
+    ds = datasets.load_dataset(
+        "thepurpleowl/codequeries", "twostep", split=datasets.Split.TEST
+    )
     cols_to_remove = [
         "context_block",
         "answer_spans",
