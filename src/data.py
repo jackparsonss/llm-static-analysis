@@ -12,4 +12,4 @@ def load_data():
 
 if __name__ == "__main__":
     dataset = load_data()
-    print(next(dataset))
+    dataset = next(dataset)
