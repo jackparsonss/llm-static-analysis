@@ -33,7 +33,7 @@ def filter(row):
 
     # limit to 5
     counter[name] += 1
-    if counter[name] > 5:
+    if counter[name] > 3:
         return False
 
     seen.add(pair)
