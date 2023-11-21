@@ -8,3 +8,8 @@ def load_data():
     )
 
     return iter(ds)
+
+
+if __name__ == "__main__":
+    dataset = load_data()
+    print(next(dataset))
