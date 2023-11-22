@@ -11,7 +11,7 @@
  */
 
 import python
-import Variables.Definition
+import Definition
 
 predicate global_name_used(Module m, string name) {
   exists(Name u, GlobalVariable v |

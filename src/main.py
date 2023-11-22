@@ -9,9 +9,9 @@ def create_codeql_database():
         "../codeql/codeql",
         "database",
         "create",
-        "temp103",
+        "db",
         "--language=python",
-        "--source-root=../data/rcbops/glance-buildpackage/glance/tests/unit/",
+        "--source-root=../data/rcbops/glance-buildpackage/glance/tests/unit/test_db",
     ]
 
     # # Run the CodeQL command to create the database
@@ -27,23 +27,20 @@ def run_codeql_query():
         "query",
         "run",
         "--database",
-        "../src/temp103",
+        "../src/db",
         codeql_query_file,
     ]
+    print("yes")
     result = subprocess.run(codeql_query_command, capture_output=True, text=True)
     print(result.stdout)
 
 
+
 def main():
     dataset = load_data()
+    create_codeql_database()
+    run_codeql_query()
 
-    for row in dataset:
-        print("Question Name:", row["query_name"])
-        print("File Path:", row["code_file_path"])
-
-    # with open("../data/" + dataset["code_file_path"]) as file:
-    # create_codeql_database()
-    # run_codeql_query()
 
 
 if __name__ == "__main__":
