@@ -19,7 +19,7 @@ valid_queries = {
 
 def create_codeql_database(query_path):
     # Make a database from a single file
-    query_path = move_file_to_directory(query_path)
+    path = move_file_to_directory(query_path)
 
     # Define the CodeQL command to create a database
     codeql_create_command = [
@@ -28,13 +28,13 @@ def create_codeql_database(query_path):
         "create",
         "db",
         "--language=python",
-        f"--source-root={query_path}",
+        f"--source-root={path}",
     ]
 
     # Run the CodeQL command to create the database
     print("Creating database for file:", query_path)
     subprocess.run(codeql_create_command, stdout=subprocess.DEVNULL)
-    print("Finished Creating Database")
+    print("Finished Creating Database\n\n")
 
 
 def run_codeql_query(query_filename):
@@ -48,9 +48,9 @@ def run_codeql_query(query_filename):
         query_file,
     ]
 
-    print("Running query: " + query_file, "on file: " + query_filename)
+    print("Running query: " + query_file, "on with type: " + query_filename)
     result = subprocess.run(codeql_query_command, capture_output=True, text=True)
-    print("Finished Query.")
+    print("Finished Query.\n\n")
     print(result.stdout)
 
     # cleanup

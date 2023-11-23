@@ -64,17 +64,14 @@ def filter_data():
 
 
 def load_data():
-    ds = datasets.load_from_disk("filtered_data")
+    ds = datasets.load_from_disk("../filtered_data")
     return iter(ds)
-
 
 def move_file_to_directory(file_path):
     _, filename = os.path.split(file_path)
     os.makedirs("temp")
     shutil.copy("../data/" + file_path, "./temp")
     return "./temp"
-
-
 
 
 if __name__ == "__main__":
