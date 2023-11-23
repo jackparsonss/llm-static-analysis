@@ -2,9 +2,9 @@
 - [Description](https://codeql.github.com/codeql-query-help/python/py-unnecessary-pass/)
 - [Query](https://github.com/github/codeql/blob/main/python/ql/src/Statements/UnnecessaryPass.ql)
 
-## Unreachable `except` block
-- [Description](https://codeql.github.com/codeql-query-help/python/py-unreachable-except/)
-- [Query](https://github.com/github/codeql/blob/main/python/ql/src/Exceptions/IncorrectExceptOrder.ql)
+## Unused Local Variable
+- [Description](https://codeql.github.com/codeql-query-help/python/py-unused-local-variable/)
+- [Query](https://github.com/github/codeql/blob/main/python/ql/src/Variables/UnusedLocalVariable.ql)
 
 
 ## Unreachable code
@@ -26,21 +26,21 @@
 - [Query](https://github.com/github/codeql/blob/main/python/ql/src/Imports/MultipleImports.ql)
 
 
-## `break` or `return` statement in finally
-- [Description](https://codeql.github.com/codeql-query-help/python/py-exit-from-finally/)
-- [Query](https://github.com/github/codeql/blob/main/python/ql/src/Statements/BreakOrReturnInFinally.ql)
+## Testing equality to `None`
+- [Description](https://codeql.github.com/codeql-query-help/python/py-test-equals-none/)
+- [Query](https://github.com/github/codeql/blob/main/python/ql/src/Expressions/EqualsNone.ql)
 
 
-## Unnecessary `else` clause in loop
-- [Description](https://codeql.github.com/codeql-query-help/python/py-redundant-else/)
-- [Query](https://github.com/github/codeql/blob/main/python/ql/src/Statements/UnnecessaryElseClause.ql)
+## Variable defined multiple times
+- [Description](https://codeql.github.com/codeql-query-help/python/py-multiple-definition/)
+- [Query](https://github.com/github/codeql/blob/main/python/ql/src/Variables/MultiplyDefined.ql)
 
 
-## Use of `return` or `yield` outside a function
-- [Description](https://codeql.github.com/codeql-query-help/python/py-return-or-yield-outside-function/)
-- [Query](https://github.com/github/codeql/blob/main/python/ql/src/Statements/ReturnOrYieldOutsideFunction.ql)
+## First argument to super() is not enclosing class
+- [Description](https://codeql.github.com/codeql-query-help/python/py-super-not-enclosing-class/)
+- [Query](https://github.com/github/codeql/blob/main/python/ql/src/Expressions/CallToSuperWrongClass.ql)
 
 
-## `__init__` method returns a value
-- [Description](https://codeql.github.com/codeql-query-help/python/py-explicit-return-in-init/)
-- [Query](https://github.com/github/codeql/blob/main/python/ql/src/Functions/ExplicitReturnInInit.ql)
+## Comparison of identical values
+- [Description](https://codeql.github.com/codeql-query-help/python/py-comparison-of-identical-expressions/)
+- [Query](https://github.com/github/codeql/blob/main/python/ql/src/Expressions/CompareIdenticalValues.ql)

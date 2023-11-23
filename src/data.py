@@ -8,15 +8,15 @@ seen = set()
 
 valid_queries = [
     "Unnecessary pass",
-    "Unreachable `except` block",
     "Unreachable code",
+    "Unused local variable",
     "Unused import",
     "`__eq__` not overridden when adding attributes",
     "Module is imported more than once",
-    "`break` or `return` statement in finally",
-    "Unnecessary `else` clause in loop",
-    "Use of `return` or `yield` outside a function",
-    "`__init__` method returns a value",
+    "Testing equality to None",
+    "Variable defined multiple times",
+    "First argument to super() is not enclosing class",
+    "Comparison of identical values",
 ]
 
 
@@ -32,9 +32,9 @@ def filter(row):
     if pair in seen:
         return False
 
-    # limit to 5
+    # limit to 3
     counter[name] += 1
-    if counter[name] > 5:
+    if counter[name] > 3:
         return False
 
     seen.add(pair)

@@ -36,10 +36,14 @@ def run_codeql_query(query_filename):
 
 def main():
     dataset = load_data()
-    create_codeql_database(
-        "../data/rcbops/glance-buildpackage/glance/tests/unit/test_db"
-    )
-    run_codeql_query("../queries/unused_import.ql")
+    # create_codeql_database(
+    #    "../data/rcbops/glance-buildpackage/glance/tests/unit/test_db"
+    # )
+    # run_codeql_query("../queries/unused_import.ql")
+
+    for row in dataset:
+        print("Question Name:", row["query_name"])
+        print("File Path:", row["code_file_path"])
 
 
 if __name__ == "__main__":
