@@ -2,3 +2,4 @@ __pycache__
 data/
 filtered_data/
 codeql/
+.DS_Store
