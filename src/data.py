@@ -2,6 +2,7 @@
 import os
 import datasets
 from collections import defaultdict
+import shutil
 
 counter = defaultdict(int)
 seen = set()
@@ -68,24 +69,12 @@ def load_data():
 
 
 def move_file_to_directory(file_path):
-    # Get the directory and filename from the given path
-    directory, filename = os.path.split(file_path)
+    _, filename = os.path.split(file_path)
+    os.makedirs("temp")
+    shutil.copy("../data/" + file_path, "./temp")
+    return "./temp"
 
-    # Create the new directory path
-    new_directory = os.path.join(directory, filename.split(".")[0])
 
-    # Create the directory if it doesn't exist
-    os.makedirs(new_directory, exist_ok=True)
-
-    # Build the new file path
-    new_file_path = os.path.join(new_directory, filename)
-
-    # Move the file to the new directory
-    os.rename(file_path, new_file_path)
-
-    print(f"Moved {file_path} -> {new_file_path}")
-
-    return new_file_path
 
 
 if __name__ == "__main__":

@@ -3,3 +3,5 @@ data/
 filtered_data/
 codeql/
 .DS_Store
+temp/
+db/
