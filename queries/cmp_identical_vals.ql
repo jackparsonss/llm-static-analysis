@@ -15,7 +15,7 @@
  */
 
 import python
-import Expressions.RedundantComparison
+import RedundantComparison
 
 from RedundantComparison comparison
 where not comparison.isConstant() and not comparison.maybeMissingSelf()
