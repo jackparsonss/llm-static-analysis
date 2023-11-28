@@ -39,8 +39,16 @@ predicate double_import(Import original, Import duplicate, Module m) {
   )
 }
 
-from Import original, Import duplicate, Module m
-where double_import(original, duplicate, m)
+from Import original, Import duplicate, Module m, File f
+where
+  double_import(original, duplicate, m) and
+  (
+    f.getBaseName() = "facebook.py" or
+    f.getBaseName() = "pytester.py" or
+    f.getBaseName() = "test_interpolation.py"
+  ) and
+  original.getEnclosingModule().getFile().getBaseName() = f.getBaseName()
 select duplicate,
   "This import of module " + m.getName() + " is redundant, as it was previously imported $@.",
-  original, "on line " + original.getLocation().getStartLine().toString()
+  original, "on line " + original.getLocation().getStartLine().toString(), f.getBaseName(),
+  "File Name"

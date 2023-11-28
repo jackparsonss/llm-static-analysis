@@ -122,6 +122,16 @@ predicate unused_import(Import imp, Variable name) {
   imp.getAName().getValue().pointsTo(_)
 }
 
-from Stmt s, Variable name
-where unused_import(s, name)
-select s, "Import of '" + name.getId() + "' is not used."
+// Declare the parameter
+from Stmt s, Variable name, File f
+where
+  unused_import(s, name) and
+  (
+    f.getBaseName() = "test_db.py"
+    or
+    f.getBaseName() = "test_multinomial.py"
+    or
+    f.getBaseName() = "streamingExtensions.py"
+  ) and
+  f.getBaseName() = s.getEnclosingModule().getFile().getBaseName()
+select s, "Import of '" + name.getId() + "' is not used.", f.getBaseName(), "File Name"

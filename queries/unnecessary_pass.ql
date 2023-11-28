@@ -21,12 +21,18 @@ predicate has_doc_string(StmtList stmts) {
   is_doc_string(stmts.getItem(0))
 }
 
-from Pass p, StmtList list
+from Pass p, StmtList list, File f
 where
   list.getAnItem() = p and
   (
     strictcount(list.getAnItem()) = 2 and not has_doc_string(list)
     or
     strictcount(list.getAnItem()) > 2
-  )
-select p, "Unnecessary 'pass' statement."
+  ) and
+  (
+    f.getBaseName() = "admin.py" or
+    f.getBaseName() = "test_heapyc.py" or
+    f.getBaseName() = "pycomms.py"
+  ) and
+  p.getEnclosingModule().getFile().getBaseName() = f.getBaseName()
+select p, "Unnecessary 'pass' statement.", f.getBaseName(), "File Name"

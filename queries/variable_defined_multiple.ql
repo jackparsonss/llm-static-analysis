@@ -61,11 +61,17 @@ predicate uninteresting_definition(AstNode asgn1) {
   exists(AssignStmt a | a.getATarget() = asgn1 | simple_literal(a.getValue()))
 }
 
-from AstNode asgn1, AstNode asgn2, Variable v
+from AstNode asgn1, AstNode asgn2, Variable v, File f
 where
   multiply_defined(asgn1, asgn2, v) and
   forall(Name el | el = asgn1.getParentNode().(Tuple).getAnElt() | multiply_defined(el, _, _)) and
-  not uninteresting_definition(asgn1)
+  not uninteresting_definition(asgn1) and
+  (
+    f.getBaseName() = "segmentation.py" or
+    f.getBaseName() = "ArrayPlot.py" or
+    f.getBaseName() = "tests.py"
+  ) and
+  v.getScope().getEnclosingModule().getFile().getBaseName() = f.getBaseName()
 select asgn1,
   "This assignment to '" + v.getId() + "' is unnecessary as it is $@ before this value is used.",
-  asgn2, "redefined"
+  asgn2, "redefined", f.getBaseName(), "File Name"

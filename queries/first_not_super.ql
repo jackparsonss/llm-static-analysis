@@ -16,12 +16,15 @@ import python
 import semmle.python.dataflow.new.DataFlow
 import semmle.python.ApiGraphs
 
-from DataFlow::CallCfgNode call_to_super, string name
+from DataFlow::CallCfgNode call_to_super, string name, File f
 where
   call_to_super = API::builtin("super").getACall() and
   name = call_to_super.getScope().getScope().(Class).getName() and
   exists(DataFlow::Node arg |
     arg = call_to_super.getArg(0) and
     arg.getALocalSource().asExpr().(Name).getId() != name
-  )
-select call_to_super.getNode(), "First argument to super() should be " + name + "."
+  ) and
+  (f.getBaseName() = "views.py" or f.getBaseName() = "simple.py") and
+  call_to_super.getNode().getEnclosingModule().getFile().getBaseName() = f.getBaseName()
+select call_to_super.getNode(), "First argument to super() should be " + name + ".",
+  f.getBaseName(), "File Name"

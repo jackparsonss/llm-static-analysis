@@ -17,6 +17,15 @@
 import python
 import RedundantComparison
 
-from RedundantComparison comparison
-where not comparison.isConstant() and not comparison.maybeMissingSelf()
-select comparison, "Comparison of identical values; use cmath.isnan() if testing for not-a-number."
+from RedundantComparison comparison, File f
+where
+  not comparison.isConstant() and
+  not comparison.maybeMissingSelf() and
+  (
+    f.getBaseName() = "test_richcmp.py" or
+    f.getBaseName() = "test_tztime.py" or
+    f.getBaseName() = "test_refs.py"
+  ) and
+  comparison.getEnclosingModule().getFile().getBaseName() = f.getBaseName()
+select comparison, "Comparison of identical values; use cmath.isnan() if testing for not-a-number.",
+  f.getBaseName(), "File Name"

@@ -38,9 +38,15 @@ private AnnAssign annotation_without_assignment(LocalVariable v) {
   not exists(result.getValue())
 }
 
-from Name unused, LocalVariable v
+from Name unused, LocalVariable v, File f
 where
   unused_local(unused, v) and
+  (
+    f.getBaseName() = "test_ctxmgmt.py" or
+    f.getBaseName() = "lxc.py" or
+    f.getBaseName() = "win_registry_key_object.py"
+  ) and
+  v.getScope().getEnclosingModule().getFile().getBaseName() = f.getBaseName() and
   // If unused is part of a tuple, count it as unused if all elements of that tuple are unused.
   forall(Name el | el = unused.getParentNode().(Tuple).getAnElt() | unused_local(el, _))
-select unused, "Variable " + v.getId() + " is not used."
+select unused, "Variable " + v.getId() + " is not used.", f.getBaseName(), "File Name"

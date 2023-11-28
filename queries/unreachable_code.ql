@@ -59,7 +59,13 @@ predicate reportable_unreachable(Stmt s) {
   not marks_an_impossible_else_branch(s)
 }
 
-from Stmt s
-where reportable_unreachable(s)
-select s, "This statement is unreachable."
-
+from Stmt s, File f
+where
+  reportable_unreachable(s) and
+  (
+    f.getBaseName() = "legacyexpedientapi.py" or
+    f.getBaseName() = "dynamodump.py" or
+    f.getBaseName() = "__init__.py"
+  ) and
+  s.getEnclosingModule().getFile().getBaseName() = f.getBaseName()
+select s, "This statement is unreachable.", f.getBaseName(), "File Name"

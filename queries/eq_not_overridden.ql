@@ -1,15 +1,3 @@
-/**
- * @name `__eq__` not overridden when adding attributes
- * @description When adding new attributes to instances of a class, equality for that class needs to be defined.
- * @kind problem
- * @tags reliability
- *       correctness
- * @problem.severity warning
- * @sub-severity high
- * @precision high
- * @id py/missing-equals
- */
-
 import python
 import Equality
 
@@ -31,10 +19,6 @@ predicate should_override_eq(ClassValue cls, Value base_eq) {
   )
 }
 
-/**
- * Does the non-overridden __eq__ method access the attribute,
- * which implies that the  __eq__ method does not need to be overridden.
- */
 predicate superclassEqExpectsAttribute(ClassValue cls, FunctionValue base_eq, string attrname) {
   not cls.declaresAttribute("__eq__") and
   exists(ClassValue sup | sup = cls.getABaseType() and sup.declaredAttribute("__eq__") = base_eq |
