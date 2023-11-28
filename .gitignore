@@ -5,3 +5,4 @@ codeql/
 .DS_Store
 temp/
 db/
+.env

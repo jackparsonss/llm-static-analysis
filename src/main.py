@@ -1,7 +1,11 @@
 from data import load_data, move_file_to_directory
 import subprocess
 import shutil
+from openai import OpenAI
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 
 valid_queries = {
     "Unnecessary pass": "../queries/unnecessary_path.ql",
@@ -15,6 +19,8 @@ valid_queries = {
     "First argument to super() is not enclosing class": "../queries/first_not_super.ql",
     "Comparison of identical values": "../queries/cmp_identical_vals.ql",
 }
+
+client = OpenAI(organization=os.getenv("ORG_ID"))
 
 
 def create_codeql_database(query_path):
