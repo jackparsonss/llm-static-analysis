@@ -4,6 +4,9 @@ import shutil
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
+import tiktoken
+import json
+import difflib
 
 load_dotenv()
 
@@ -54,32 +57,77 @@ def run_codeql_query(query_filename):
     print("Finished Query.\n\n")
     print(result.stdout)
 
+
     # cleanup
     shutil.rmtree("db")
     shutil.rmtree("temp")
 
+def fix_codeql_problem():
+
+    pass
+
+
+def rank_llm_code():
+    pass
+
+
+def read_file_content(file_path):
+    with open(file_path, "r", encoding="utf-8") as file:
+        content = file.read()
+    return content
+
+def blabla(file_path):
+    with open(file_path, "r", encoding="utf-8") as file:
+        content = file.readlines()
+    return content
+
+
 
 def main():
-    response = client.chat.completions.create(
-        model="gpt-3.5-turbo-1106",
-        response_format={"type": "json_object"},
-        messages=[
-            {
-                "role": "system",
-                "content": "You are a helpful assistant designed to output JSON.",
-            },
-            {"role": "user", "content": "Who won the world series in 2020?"},
-        ],
-    )
-
-    print(response.choices[0].message.content)
-
     dataset = load_data()
     for row in dataset:
-        if row["query_name"] == "`__eq__` not overridden when adding attributes":
+        if (row["code_file_path"] == "n9code/pylease/tests/test_ctxmgmt.py"):
             create_codeql_database(row["code_file_path"])
             run_codeql_query(row["query_name"])
+            content = read_file_content("../data/" + row["code_file_path"])
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo-1106",
+                response_format={"type": "json_object"},
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "You are a helpful assistant designed to output JSON.",
+                    },
+                    {"role": "user", "content": 
+                        '''The following input is a python file that I have ran a codeql
+                            query against that contains an unused local variable static analysis
+                            problem. Please do not touch anything that doesn't relate to this problem
+                            and output the same python file with a fix that does not contain an unused local variable. 
+                            name your output key of json response 'modified_python_file'
+                        '''
+                    },
+                    {"role": "user", "content": content},
+                ],
+            )
+            python_file_fix = json.loads(response.choices[0].message.content)["modified_python_file"]
+            print(python_file_fix)
+            original_content = blabla("../data/" + row["code_file_path"])
+            with open("edit.py", "w") as edit_content_file:
+                edit_content_file.write(python_file_fix)
+            
+            fix_content = blabla("edit.py")
+            d = difflib.Differ()
+            diff = d.compare(original_content, fix_content)
 
+            print('\n'.join(diff))
+
+        # print("-----------")
+        # print("File: " + row["code_file_path"])
+        # print("Query: " + row["query_name"])
+        # file_content = read_file_content("../data/" +row["code_file_path"])
+        # encoding = tiktoken.encoding_for_model("gpt-3.5-turbo")
+        # print("Requires: " + str(len(encoding.encode(file_content))) + " Tokens")
+        # print("-----------")
 
 if __name__ == "__main__":
     main()
