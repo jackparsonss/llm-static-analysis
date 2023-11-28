@@ -20,7 +20,7 @@ valid_queries = {
     "Comparison of identical values": "../queries/cmp_identical_vals.ql",
 }
 
-client = OpenAI(organization=os.getenv("ORG_ID"))
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"), organization=os.getenv("ORG_ID"))
 
 
 def create_codeql_database(query_path):
@@ -65,11 +65,26 @@ def run_codeql_query(query_filename):
 
 
 def main():
-    dataset = load_data()
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo-1106",
+        response_format={"type": "json_object"},
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a helpful assistant designed to output JSON.",
+            },
+            {"role": "user", "content": "Who won the world series in 2020?"},
+        ],
+    )
 
-    for row in dataset:
-        create_codeql_database(row["code_file_path"])
-        run_codeql_query(row["query_name"])
+    print(response.choices[0].message.content)
+
+
+# dataset = load_data()
+
+# for row in dataset:
+# create_codeql_database(row["code_file_path"])
+# run_codeql_query(row["query_name"])
 
 
 if __name__ == "__main__":
