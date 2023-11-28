@@ -8,15 +8,10 @@ counter = defaultdict(int)
 seen = set()
 
 valid_queries = [
-    "Unnecessary pass",
     "Unreachable code",
     "Unused local variable",
     "Unused import",
-    "`__eq__` not overridden when adding attributes",
     "Module is imported more than once",
-    "Testing equality to None",
-    "Variable defined multiple times",
-    "First argument to super() is not enclosing class",
     "Comparison of identical values",
 ]
 
@@ -66,6 +61,7 @@ def filter_data():
 def load_data():
     ds = datasets.load_from_disk("../filtered_data")
     return iter(ds)
+
 
 def move_file_to_directory(file_path):
     _, filename = os.path.split(file_path)

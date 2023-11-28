@@ -8,15 +8,10 @@ import os
 load_dotenv()
 
 valid_queries = {
-    "Unnecessary pass": "../queries/unnecessary_path.ql",
     "Unreachable code": "../queries/unreachable_code.ql",
     "Unused local variable": "../queries/unused_local_variable.ql",
     "Unused import": "../queries/unused_import.ql",
-    "`__eq__` not overridden when adding attributes": "../queries/eq_not_overriden.ql",
     "Module is imported more than once": "../queries/module_import_more_than_once.ql",
-    "Testing equality to None": "../queries/equality_to_none.ql",
-    "Variable defined multiple times": "../queries/variable_defined_multiple.ql",
-    "First argument to super() is not enclosing class": "../queries/first_not_super.ql",
     "Comparison of identical values": "../queries/cmp_identical_vals.ql",
 }
 
@@ -79,12 +74,11 @@ def main():
 
     print(response.choices[0].message.content)
 
-
-# dataset = load_data()
-
-# for row in dataset:
-# create_codeql_database(row["code_file_path"])
-# run_codeql_query(row["query_name"])
+    dataset = load_data()
+    for row in dataset:
+        if row["query_name"] == "`__eq__` not overridden when adding attributes":
+            create_codeql_database(row["code_file_path"])
+            run_codeql_query(row["query_name"])
 
 
 if __name__ == "__main__":
