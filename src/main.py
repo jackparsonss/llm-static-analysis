@@ -10,7 +10,7 @@ import difflib
 from datetime import datetime
 import os
 
-arg_mapping = {"gpt-3.5": "gpt-3.5-turbo-1106", "gpt-4": "gpt-4"}
+arg_mapping = {"gpt-3.5": "gpt-3.5-turbo-1106", "gpt-4": "gpt-4-1106-preview"}
 
 parser = argparse.ArgumentParser(description="Static Analsyis With LLMs")
 
