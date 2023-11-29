@@ -85,8 +85,10 @@ def fix_codeql_problem(file_path, query_name, codeql_results):
         {codeql_results}\n Your task is to take this codeql results alongside the type 
         of static analysis query I've run and fix this problem in the code. Do not modify,
         refactor, or change any code that does not directly relate to the issue. Retain all logic
-        and output as is, do not rewrite any code even if it looks cleaner. Name your output key
-        of the JSON response 'modified_python_file'.
+        and output as is, do not rewrite any code even if it looks cleaner. Basically think of
+        yourself as an intern developer at a big technology company, you found the problem
+        and you don't want to break anything else so your only fixing the lines that directly
+        relate to the problem. Name your output key of the JSON response 'modified_python_file'.
     '''
     print(prompt)
 
