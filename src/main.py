@@ -19,11 +19,11 @@ parser.add_argument("--rank_llm", choices=["gpt-3.5", "gpt-4"])
 args = parser.parse_args()
 
 valid_queries = {
-    "Unreachable code": "../queries/unreachable_code.ql",
-    "Unused local variable": "../queries/unused_local_variable.ql",
-    "Unused import": "../queries/unused_import.ql",
-    "Module is imported more than once": "../queries/module_import_more_than_once.ql",
-    "Comparison of identical values": "../queries/cmp_identical_vals.ql",
+    "Unreachable code": "./queries/unreachable_code.ql",
+    "Unused local variable": "./queries/unused_local_variable.ql",
+    "Unused import": "./queries/unused_import.ql",
+    "Module is imported more than once": "./queries/module_import_more_than_once.ql",
+    "Comparison of identical values": "./queries/cmp_identical_vals.ql",
 }
 
 
@@ -53,6 +53,7 @@ def create_codeql_database(query_path):
 
 def run_codeql_query(query_filename):
     query_file = valid_queries[query_filename]
+    print(query_file)
     codeql_query_command = [
         "./codeql/codeql",
         "query",
@@ -84,7 +85,7 @@ def fix_codeql_problem(file_path, query_name, codeql_results):
     prompt = f"""
         The following input is a python file that I have run a codeql query against
         that checks for {query_name}. This query returned this as the results \n
-        {codeql_results}\n Your task is to take this codeql results alongside the type 
+        {codeql_results}\nYour task is to take this codeql results alongside the type 
         of static analysis query I've run and fix this problem in the code. Do not modify,
         refactor, or change any code that does not directly relate to the issue. Retain all logic
         and output as is, do not rewrite any code even if it looks cleaner. Basically think of
