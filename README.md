@@ -29,3 +29,6 @@ make experiment
 
 ## Cleaning Folders
 Running the experiment lots of times will result in a lot of `<time>_output/` folders, this command will delete them all
+```
+make clean 
+```
