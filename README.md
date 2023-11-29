@@ -6,6 +6,7 @@ make build
 ```
 
 ## Step 2: Add OpenAI Credentials to `.env` file
+You need to create a `.env` file in the root directory and add the following environment variables to it
 ```
 
 ORG_ID=<ORG_ID>
