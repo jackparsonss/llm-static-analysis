@@ -4,7 +4,7 @@ import sys
 
 
 def download_data():
-    if not os.path.exists("data2"):
+    if not os.path.exists("data"):
         print("Downloading data...")
         subprocess.run(
             [

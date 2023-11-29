@@ -12,17 +12,23 @@ ORG_ID=<ORG_ID>
 OPENAI_API_KEY=<API_KEY>
 ```
 
-## Step 3: Fetch Data(this could take a while)
+## Step 3: Setup CodeQL
+OS options: mac | linux | windows
+```
+make codeql-<os>
+```
+
+## Step 4: Fetch Data(this could take a while)
 ```
 make fetch
 ```
 
-## Step 4: Filter the data
+## Step 5: Filter the data
 ```
 make data 
 ```
 
-## Step 5: Run Test Experiment
+## Step 6: Run Test Experiment
 ```
 make experiment
 ```
