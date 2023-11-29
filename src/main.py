@@ -23,7 +23,7 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"), organization=os.getenv("ORG
 def create_codeql_database(query_path):
     # Define the CodeQL command to create a database
     codeql_create_command = [
-        "../codeql/codeql",
+        "./codeql/codeql",
         "database",
         "create",
         "db",
@@ -40,7 +40,7 @@ def create_codeql_database(query_path):
 def run_codeql_query(query_filename):
     query_file = valid_queries[query_filename]
     codeql_query_command = [
-        "../codeql/codeql",
+        "./codeql/codeql",
         "query",
         "run",
         "--database",
@@ -78,8 +78,9 @@ def fix_codeql_problem(file_path, query_name, codeql_results):
         and you don't want to break anything else so your only fixing the lines that directly
         relate to the problem. Name your output key of the JSON response 'modified_python_file'.
     """
-    print(prompt)
+    print("PROMPT:\n", prompt)
 
+    print("Sending Prompt to LLM...")
     response = client.chat.completions.create(
         model="gpt-3.5-turbo-1106",
         response_format={"type": "json_object"},
@@ -131,10 +132,10 @@ def main():
             create_codeql_database(move_file_to_directory(row["code_file_path"]))
 
             results = run_codeql_query(row["query_name"])
-            shutil.rmtree("temp")
+            shutil.rmtree("./temp")
 
             fix_codeql_problem(
-                "../data/" + row["code_file_path"], row["query_name"], results
+                "./data/" + row["code_file_path"], row["query_name"], results
             )
 
 

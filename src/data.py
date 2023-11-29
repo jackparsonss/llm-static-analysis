@@ -53,20 +53,19 @@ def filter_data():
     ds = ds.remove_columns(cols_to_remove)
 
     ds = ds.filter(filter)
-    ds.save_to_disk("filtered_data")
+    ds.save_to_disk("./filtered_data")
 
     return ds
 
 
 def load_data():
-    ds = datasets.load_from_disk("../filtered_data")
+    ds = datasets.load_from_disk("./filtered_data")
     return iter(ds)
 
 
 def move_file_to_directory(file_path):
-    _, filename = os.path.split(file_path)
-    os.makedirs("temp")
-    shutil.copy("../data/" + file_path, "./temp")
+    os.makedirs("./temp")
+    shutil.copy("./data/" + file_path, "./temp")
     return "./temp"
 
 
