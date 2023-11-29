@@ -6,3 +6,4 @@ codeql/
 temp/
 db/
 .env
+*_output/
