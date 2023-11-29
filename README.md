@@ -12,13 +12,20 @@ ORG_ID=<ORG_ID>
 OPENAI_API_KEY=<API_KEY>
 ```
 
-## Step 3: Download and Filter the data
+## Step 3: Fetch Data(this could take a while)
+```
+make fetch
+```
+
+## Step 4: Download and Filter the data
 ```
 make data 
 ```
 
-## Step 4: Run Test Experiment
+## Step 5: Run Test Experiment
 ```
 make experiment
 ```
 
+## Cleaning Folders
+Running the experiment lots of times will result in a lot of `<time>_output/` folders, this command will delete them all
