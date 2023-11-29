@@ -4,7 +4,6 @@ import shutil
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
-import tiktoken
 import json
 import difflib
 
@@ -21,14 +20,7 @@ valid_queries = {
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"), organization=os.getenv("ORG_ID"))
 
 
-def create_codeql_database(query_path, flag = True):
-    # Make a database from a single file
-    path = ""
-    if (flag): # Just doing this for now because edit.py doesn't need to be moved
-        path = move_file_to_directory(query_path)
-    else:
-        path = query_path
-        
+def create_codeql_database(query_path):
     # Define the CodeQL command to create a database
     codeql_create_command = [
         "../codeql/codeql",
@@ -36,7 +28,7 @@ def create_codeql_database(query_path, flag = True):
         "create",
         "db",
         "--language=python",
-        f"--source-root={path}",
+        f"--source-root={query_path}",
     ]
 
     # Run the CodeQL command to create the database
@@ -45,7 +37,7 @@ def create_codeql_database(query_path, flag = True):
     print("Finished Creating Database\n\n")
 
 
-def run_codeql_query(query_filename, flag = True):
+def run_codeql_query(query_filename):
     query_file = valid_queries[query_filename]
     codeql_query_command = [
         "../codeql/codeql",
@@ -61,13 +53,11 @@ def run_codeql_query(query_filename, flag = True):
     print("Finished Query.\n\n")
     print(result.stdout)
 
-
     # cleanup
     shutil.rmtree("db")
-    if (flag):
-        shutil.rmtree("temp")
 
     return result.stdout
+
 
 def rank_llm_output():
     pass
@@ -77,9 +67,7 @@ def fix_codeql_problem(file_path, query_name, codeql_results):
     with open(file_path, "r", encoding="utf-8") as file:
         content = file.read()
 
-
-    
-    prompt = f'''
+    prompt = f"""
         The following input is a python file that I have run a codeql query against
         that checks for {query_name}. This query returned this as the results \n
         {codeql_results}\n Your task is to take this codeql results alongside the type 
@@ -89,42 +77,45 @@ def fix_codeql_problem(file_path, query_name, codeql_results):
         yourself as an intern developer at a big technology company, you found the problem
         and you don't want to break anything else so your only fixing the lines that directly
         relate to the problem. Name your output key of the JSON response 'modified_python_file'.
-    '''
+    """
     print(prompt)
 
     response = client.chat.completions.create(
-                model="gpt-3.5-turbo-1106",
-                response_format={"type": "json_object"},
-                messages=[
-                    {"role": "system","content": "You are a helpful assistant designed to output JSON.",},
-                    {"role": "user", "content": prompt},
-                    {"role": "user", "content": content},
-                ],
+        model="gpt-3.5-turbo-1106",
+        response_format={"type": "json_object"},
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a helpful assistant designed to output JSON.",
+            },
+            {"role": "user", "content": prompt},
+            {"role": "user", "content": content},
+        ],
     )
-    
-    #Write the modified python file to edit.py
-    modified_python_file = json.loads(response.choices[0].message.content)["modified_python_file"]
+
+    # Write the modified python file to edit.py
+    modified_python_file = json.loads(response.choices[0].message.content)[
+        "modified_python_file"
+    ]
     with open("./edit/edit.py", "w") as edit_content_file:
         edit_content_file.write(modified_python_file)
-    
+
     modified_python_file_content = read_file_content("./edit/edit.py")
     original_python_file_content = read_file_content(file_path)
 
     # Stick it in seperate folders -> Maybe have folder structure thats not just edit/edit.py
 
     # Run Query to see if llm fixed problem
-    create_codeql_database("./edit", False)
-    results = run_codeql_query(query_name, False)
+    create_codeql_database("./edit")
+    results = run_codeql_query(query_name)
 
-    compare_content(modified_python_file_content,original_python_file_content)
+    compare_content(modified_python_file_content, original_python_file_content)
 
 
-def compare_content(original_content,modified_content):
+def compare_content(original_content, modified_content):
     d = difflib.Differ()
     diff = d.compare(original_content, modified_content)
-    print('\n'.join(diff))
-
-
+    print("\n".join(diff))
 
 
 def read_file_content(file_path):
@@ -136,29 +127,16 @@ def read_file_content(file_path):
 def main():
     dataset = load_data()
     for row in dataset:
-        if (row["code_file_path"] == "n9code/pylease/tests/test_ctxmgmt.py"):
-            create_codeql_database(row["code_file_path"])
+        if row["code_file_path"] == "n9code/pylease/tests/test_ctxmgmt.py":
+            create_codeql_database(move_file_to_directory(row["code_file_path"]))
 
             results = run_codeql_query(row["query_name"])
+            shutil.rmtree("temp")
 
-            fix_codeql_problem("../data/" + row["code_file_path"], row["query_name"], results)
+            fix_codeql_problem(
+                "../data/" + row["code_file_path"], row["query_name"], results
+            )
+
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
-
-
-
-# print("-----------")
-# print("File: " + row["code_file_path"])
-# print("Query: " + row["query_name"])
-# file_content = read_file_content("../data/" +row["code_file_path"])
-# encoding = tiktoken.encoding_for_model("gpt-3.5-turbo")
-# print("Requires: " + str(len(encoding.encode(file_content))) + " Tokens")
-# print("-----------")
-
