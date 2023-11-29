@@ -62,25 +62,61 @@ def run_codeql_query(query_filename):
     shutil.rmtree("db")
     shutil.rmtree("temp")
 
-def fix_codeql_problem():
+    return result.stdout
 
+def rank_llm_output():
     pass
 
 
-def rank_llm_code():
-    pass
+def fix_codeql_problem(file_path, query_name, codeql_results):
+    with open(file_path, "r", encoding="utf-8") as file:
+        content = file.read()
+
+
+    
+    prompt = f'''
+        The following input is a python file that I have run a codeql query against
+        that checks for {query_name}. This query returned this as the results
+        {codeql_results}. Your task is to take this codeql results alongside the type 
+        of static analysis query I've run and fix this problem in the code. Do not modify,
+        refactor, or change any code that does not directly relate to the issue. Retain all logic
+        and output as is, do not rewrite any code even if it looks cleaner. Name your output key
+        of the JSON response 'modified_python_file'.
+    '''
+
+    response = client.chat.completions.create(
+                model="gpt-3.5-turbo-1106",
+                response_format={"type": "json_object"},
+                messages=[
+                    {"role": "system","content": "You are a helpful assistant designed to output JSON.",},
+                    {"role": "user", "content": prompt},
+                    {"role": "user", "content": content},
+                ],
+    )
+    
+    #Write the modified python file to edit.py
+    modified_python_file = json.loads(response.choices[0].message.content)["modified_python_file"]
+    with open("edit.py", "w") as edit_content_file:
+        edit_content_file.write(modified_python_file)
+    
+    modified_python_file_content = read_file_content("edit.py")
+    original_python_file_content = read_file_content(file_path)
+
+    compare_content(modified_python_file_content,original_python_file_content)
+
+
+def compare_content(original_content,modified_content):
+    d = difflib.Differ()
+    diff = d.compare(original_content, modified_content)
+    print('\n'.join(diff))
+
+
 
 
 def read_file_content(file_path):
     with open(file_path, "r", encoding="utf-8") as file:
-        content = file.read()
-    return content
-
-def blabla(file_path):
-    with open(file_path, "r", encoding="utf-8") as file:
         content = file.readlines()
     return content
-
 
 
 def main():
@@ -88,47 +124,27 @@ def main():
     for row in dataset:
         if (row["code_file_path"] == "n9code/pylease/tests/test_ctxmgmt.py"):
             create_codeql_database(row["code_file_path"])
-            run_codeql_query(row["query_name"])
-            content = read_file_content("../data/" + row["code_file_path"])
-            response = client.chat.completions.create(
-                model="gpt-3.5-turbo-1106",
-                response_format={"type": "json_object"},
-                messages=[
-                    {
-                        "role": "system",
-                        "content": "You are a helpful assistant designed to output JSON.",
-                    },
-                    {"role": "user", "content": 
-                        '''The following input is a python file that I have ran a codeql
-                            query against that contains an unused local variable static analysis
-                            problem. Please do not touch anything that doesn't relate to this problem
-                            and output the same python file with a fix that does not contain an unused local variable. 
-                            name your output key of json response 'modified_python_file'
-                        '''
-                    },
-                    {"role": "user", "content": content},
-                ],
-            )
-            python_file_fix = json.loads(response.choices[0].message.content)["modified_python_file"]
-            print(python_file_fix)
-            original_content = blabla("../data/" + row["code_file_path"])
-            with open("edit.py", "w") as edit_content_file:
-                edit_content_file.write(python_file_fix)
-            
-            fix_content = blabla("edit.py")
-            d = difflib.Differ()
-            diff = d.compare(original_content, fix_content)
 
-            print('\n'.join(diff))
+            results = run_codeql_query(row["query_name"])
 
-        # print("-----------")
-        # print("File: " + row["code_file_path"])
-        # print("Query: " + row["query_name"])
-        # file_content = read_file_content("../data/" +row["code_file_path"])
-        # encoding = tiktoken.encoding_for_model("gpt-3.5-turbo")
-        # print("Requires: " + str(len(encoding.encode(file_content))) + " Tokens")
-        # print("-----------")
+            fix_codeql_problem("../data/" + row["code_file_path"], row["query_name"], results)
 
 if __name__ == "__main__":
     main()
+
+
+
+
+
+
+
+
+
+# print("-----------")
+# print("File: " + row["code_file_path"])
+# print("Query: " + row["query_name"])
+# file_content = read_file_content("../data/" +row["code_file_path"])
+# encoding = tiktoken.encoding_for_model("gpt-3.5-turbo")
+# print("Requires: " + str(len(encoding.encode(file_content))) + " Tokens")
+# print("-----------")
 
