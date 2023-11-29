@@ -17,7 +17,7 @@ OPENAI_API_KEY=<API_KEY>
 make fetch
 ```
 
-## Step 4: Download and Filter the data
+## Step 4: Filter the data
 ```
 make data 
 ```
