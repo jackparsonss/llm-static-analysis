@@ -7,3 +7,6 @@ temp/
 db/
 .env
 *_output/
+bin/
+lib/
+pyvenv.cfg

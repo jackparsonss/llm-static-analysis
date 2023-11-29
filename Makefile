@@ -1,7 +1,11 @@
 .PHONY: data experiment
 
+build:
+	python3 -mvenv .
+	. bin/activate && pip3 install -r requirements.txt
+
 data:
-	python3 src/data.py
+	. bin/activate && python3 src/data.py
 
 experiment:
-	python3 src/main.py
+	. bin/activate && python3 src/main.py
