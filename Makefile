@@ -11,7 +11,7 @@ data:
 	. bin/activate && python3 src/data.py
 
 experiment:
-	. bin/activate && python3 src/main.py
+	. bin/activate && python3 src/main.py --test_llm gpt-3.5 --rank_llm gpt-3.5
 
 clean:
 	rm -rf *_output

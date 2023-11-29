@@ -1,10 +1,22 @@
+# local imports
 from data import load_data, move_file_to_directory
+from gpt import query
+
+# stdlib imports
 import subprocess
+import argparse
 import shutil
 import difflib
 from datetime import datetime
-from gpt import query
 import os
+
+arg_mapping = {"gpt-3.5": "gpt-3.5-turbo-1106", "gpt-4": "gpt-4"}
+
+parser = argparse.ArgumentParser(description="Static Analsyis With LLMs")
+
+parser.add_argument("--test_llm", choices=["gpt-3.5", "gpt-4"])
+parser.add_argument("--rank_llm", choices=["gpt-3.5", "gpt-4"])
+args = parser.parse_args()
 
 valid_queries = {
     "Unreachable code": "../queries/unreachable_code.ql",
@@ -84,7 +96,7 @@ def fix_codeql_problem(file_path, query_name, codeql_results):
     print("PROMPT:\n", prompt)
 
     print("Sending Prompt to LLM...")
-    modified_python_file = query("gpt-3.5-turbo-1106", content, prompt)
+    modified_python_file = query(arg_mapping[args.test_llm], content, prompt)
 
     # Make directory to put new files
     output_folder = make_date_folder("output")
