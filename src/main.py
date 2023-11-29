@@ -21,10 +21,14 @@ valid_queries = {
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"), organization=os.getenv("ORG_ID"))
 
 
-def create_codeql_database(query_path):
+def create_codeql_database(query_path, flag = True):
     # Make a database from a single file
-    path = move_file_to_directory(query_path)
-
+    path = ""
+    if (flag): # Just doing this for now because edit.py doesn't need to be moved
+        path = move_file_to_directory(query_path)
+    else:
+        path = query_path
+        
     # Define the CodeQL command to create a database
     codeql_create_command = [
         "../codeql/codeql",
@@ -41,7 +45,7 @@ def create_codeql_database(query_path):
     print("Finished Creating Database\n\n")
 
 
-def run_codeql_query(query_filename):
+def run_codeql_query(query_filename, flag = True):
     query_file = valid_queries[query_filename]
     codeql_query_command = [
         "../codeql/codeql",
@@ -60,7 +64,8 @@ def run_codeql_query(query_filename):
 
     # cleanup
     shutil.rmtree("db")
-    shutil.rmtree("temp")
+    if (flag):
+        shutil.rmtree("temp")
 
     return result.stdout
 
@@ -76,13 +81,14 @@ def fix_codeql_problem(file_path, query_name, codeql_results):
     
     prompt = f'''
         The following input is a python file that I have run a codeql query against
-        that checks for {query_name}. This query returned this as the results
-        {codeql_results}. Your task is to take this codeql results alongside the type 
+        that checks for {query_name}. This query returned this as the results \n
+        {codeql_results}\n Your task is to take this codeql results alongside the type 
         of static analysis query I've run and fix this problem in the code. Do not modify,
         refactor, or change any code that does not directly relate to the issue. Retain all logic
         and output as is, do not rewrite any code even if it looks cleaner. Name your output key
         of the JSON response 'modified_python_file'.
     '''
+    print(prompt)
 
     response = client.chat.completions.create(
                 model="gpt-3.5-turbo-1106",
@@ -96,11 +102,17 @@ def fix_codeql_problem(file_path, query_name, codeql_results):
     
     #Write the modified python file to edit.py
     modified_python_file = json.loads(response.choices[0].message.content)["modified_python_file"]
-    with open("edit.py", "w") as edit_content_file:
+    with open("./edit/edit.py", "w") as edit_content_file:
         edit_content_file.write(modified_python_file)
     
-    modified_python_file_content = read_file_content("edit.py")
+    modified_python_file_content = read_file_content("./edit/edit.py")
     original_python_file_content = read_file_content(file_path)
+
+    # Stick it in seperate folders -> Maybe have folder structure thats not just edit/edit.py
+
+    # Run Query to see if llm fixed problem
+    create_codeql_database("./edit", False)
+    results = run_codeql_query(query_name, False)
 
     compare_content(modified_python_file_content,original_python_file_content)
 
