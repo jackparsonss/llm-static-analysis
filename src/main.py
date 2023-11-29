@@ -1,14 +1,10 @@
 from data import load_data, move_file_to_directory
 import subprocess
 import shutil
-from openai import OpenAI
-from dotenv import load_dotenv
-import os
-import json
 import difflib
 from datetime import datetime
-
-load_dotenv()
+from gpt import query
+import os
 
 valid_queries = {
     "Unreachable code": "../queries/unreachable_code.ql",
@@ -17,8 +13,6 @@ valid_queries = {
     "Module is imported more than once": "../queries/module_import_more_than_once.ql",
     "Comparison of identical values": "../queries/cmp_identical_vals.ql",
 }
-
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"), organization=os.getenv("ORG_ID"))
 
 
 def make_date_folder(folder):
@@ -90,22 +84,7 @@ def fix_codeql_problem(file_path, query_name, codeql_results):
     print("PROMPT:\n", prompt)
 
     print("Sending Prompt to LLM...")
-    response = client.chat.completions.create(
-        model="gpt-3.5-turbo-1106",
-        response_format={"type": "json_object"},
-        messages=[
-            {
-                "role": "system",
-                "content": "You are a helpful assistant designed to output JSON.",
-            },
-            {"role": "user", "content": prompt},
-            {"role": "user", "content": content},
-        ],
-    )
-
-    modified_python_file = json.loads(response.choices[0].message.content)[
-        "modified_python_file"
-    ]
+    modified_python_file = query("gpt-3.5-turbo-1106", content, prompt)
 
     # Make directory to put new files
     output_folder = make_date_folder("output")
