@@ -109,20 +109,18 @@ def rank_llm_output(file_path,file_path_original,file_path_modified,query_name,c
     (c) changing variable names or introducing typos.
     The following is the original file and the modified file with the fix to the problem.
     Output only the reason and score for the patch below. Do not output anything else.
-    Name your output key of the JSON response 'ranking'
+    Name your output key of the JSON response 'ranking' and the value should be a string
     '''
     
     print("PROMPT:\n", prompt)
     print("Sending Prompt to LLM...")
 
     ranking = rank(arg_mapping[args.test_llm], original_file, modified_file, prompt)
-
-
-    # write output to filepath .txt
-    print("----------------")
+    # currently not listening to structure
     print(ranking)
-    print("---------------")
-    
+    # write output to filepath .txt
+    with open(file_path + "ranking.txt", "w", encoding="utf-8") as file:
+        file.write(ranking)
 
 
 def fix_codeql_problem(file_path, query_name, codeql_results):
