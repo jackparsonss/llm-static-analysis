@@ -10,6 +10,7 @@ import shutil
 import difflib
 from datetime import datetime
 import os
+import time
 
 arg_mapping = {"gpt-3.5": "gpt-3.5-turbo-1106", "gpt-4": "gpt-4-1106-preview"}
 
@@ -183,6 +184,7 @@ def rank_llm_output(
     The following is the original file and the modified file with the fix to the problem.
     Output only the reason and score for the patch below. Do not output anything else.
     Name your output key of the JSON response 'ranking' and the value should be a string
+    of just the integer score
     """
 
     print("PROMPT:\n", prompt)
@@ -190,7 +192,7 @@ def rank_llm_output(
 
     ranking = rank(arg_mapping[args.test_llm], original_file, modified_file, prompt)
     # write output to filepath .txt
-    with open(file_path + "ranking.txt", "w", encoding="utf-8") as file:
+    with open(file_path + '/ranking.txt', "w", encoding="utf-8") as file:
         file.write(ranking)
 
 
@@ -246,9 +248,7 @@ def fix_codeql_problem(file_path, query_name, codeql_results):
         new_filepath, original_filename, new_filename, query_name, codeql_results
     )
 
-    compare_content(
-        modified_python_file_content, original_python_file_content, new_filepath
-    )
+    compare_content(original_python_file_content, modified_python_file_content, new_filepath)
 
     return results
 
@@ -257,7 +257,7 @@ def compare_content(original_content, modified_content, file_path):
     d = difflib.Differ()
     diff = d.compare(original_content, modified_content)
     difference = "\n".join(diff)
-    with open(file_path + "difference.txt", "w", encoding="utf-8") as file:
+    with open(file_path + '/difference.txt', "w", encoding="utf-8") as file:
         file.write(difference)
 
 
@@ -270,15 +270,15 @@ def read_file_content(file_path):
 def main():
     dataset = load_data()
     for row in dataset:
-        # if row["code_file_path"] == "rcbops/glance-buildpackage/glance/tests/unit/test_db.py":
-        create_codeql_database(move_file_to_directory(row["code_file_path"]))
+        if row["code_file_path"] == "bayespy/bayespy/bayespy/inference/vmp/nodes/tests/test_multinomial.py":
+            create_codeql_database(move_file_to_directory(row["code_file_path"]))
 
-        results = run_codeql_query(row["query_name"])
-        shutil.rmtree("./temp")
+            results = run_codeql_query(row["query_name"])
+            shutil.rmtree("./temp")
 
-        fix_codeql_problem(
-            "./data/" + row["code_file_path"], row["query_name"], results
-        )
+            fix_codeql_problem(
+                "./data/" + row["code_file_path"], row["query_name"], results
+            )
 
 
 if __name__ == "__main__":
