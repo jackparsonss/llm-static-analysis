@@ -45,10 +45,12 @@ where
   (
     f.getBaseName() = "facebook.py" or
     f.getBaseName() = "pytester.py" or
-    f.getBaseName() = "test_interpolation.py"
+    f.getBaseName() = "test_interpolation.py" or
+    f.getBaseName() = "llm_facebook.py" or
+    f.getBaseName() = "llm_pytester.py" or
+    f.getBaseName() = "llm_test_interpolation.py"
   ) and
   original.getEnclosingModule().getFile().getBaseName() = f.getBaseName()
 select duplicate,
   "This import of module " + m.getName() + " is redundant, as it was previously imported $@.",
-  original, "on line " + original.getLocation().getStartLine().toString(), f.getBaseName(),
-  "File Name"
+  original, "on line " + original.getLocation().getStartLine().toString(), f.getBaseName(), ""

@@ -45,9 +45,11 @@ where
     f.getBaseName() = "test_ctxmgmt.py" or
     f.getBaseName() = "lxc.py" or
     f.getBaseName() = "win_registry_key_object.py" or
-    f.getBaseName() = "edit.py"
+    f.getBaseName() = "llm_test_ctxmgmt.py" or
+    f.getBaseName() = "llm_lxc.py" or
+    f.getBaseName() = "llm_win_registry_key_object.py"
   ) and
   v.getScope().getEnclosingModule().getFile().getBaseName() = f.getBaseName() and
   // If unused is part of a tuple, count it as unused if all elements of that tuple are unused.
   forall(Name el | el = unused.getParentNode().(Tuple).getAnElt() | unused_local(el, _))
-select unused, "Variable " + v.getId() + " is not used.", f.getBaseName(), "File Name"
+select unused, "Variable " + v.getId() + " is not used.", f.getBaseName(), ""

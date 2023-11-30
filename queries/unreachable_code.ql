@@ -65,7 +65,10 @@ where
   (
     f.getBaseName() = "legacyexpedientapi.py" or
     f.getBaseName() = "dynamodump.py" or
-    f.getBaseName() = "__init__.py"
+    f.getBaseName() = "__init__.py" or
+    f.getBaseName() = "llm___init__.py" or
+    f.getBaseName() = "llm_dynamodump.py" or
+    f.getBaseName() = "llm_legacyexpedientapi.py"
   ) and
   s.getEnclosingModule().getFile().getBaseName() = f.getBaseName()
-select s, "This statement is unreachable.", f.getBaseName(), "File Name"
+select s, "This statement is unreachable.", f.getBaseName(), ""

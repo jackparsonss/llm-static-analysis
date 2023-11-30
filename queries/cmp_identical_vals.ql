@@ -24,8 +24,11 @@ where
   (
     f.getBaseName() = "test_richcmp.py" or
     f.getBaseName() = "test_tztime.py" or
-    f.getBaseName() = "test_refs.py"
+    f.getBaseName() = "test_refs.py" or
+    f.getBaseName() = "llm_test_richcmp.py" or
+    f.getBaseName() = "llm_test_tztime.py" or
+    f.getBaseName() = "llm_test_refs.py"
   ) and
   comparison.getEnclosingModule().getFile().getBaseName() = f.getBaseName()
 select comparison, "Comparison of identical values; use cmath.isnan() if testing for not-a-number.",
-  f.getBaseName(), "File Name"
+  f.getBaseName(), ""

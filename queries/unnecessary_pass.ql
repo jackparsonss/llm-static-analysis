@@ -35,4 +35,4 @@ where
     f.getBaseName() = "pycomms.py"
   ) and
   p.getEnclosingModule().getFile().getBaseName() = f.getBaseName()
-select p, "Unnecessary 'pass' statement.", f.getBaseName(), "File Name"
+select p, "Unnecessary 'pass' statement.", f.getBaseName(), ""

@@ -74,4 +74,4 @@ where
   v.getScope().getEnclosingModule().getFile().getBaseName() = f.getBaseName()
 select asgn1,
   "This assignment to '" + v.getId() + "' is unnecessary as it is $@ before this value is used.",
-  asgn2, "redefined", f.getBaseName(), "File Name"
+  asgn2, "redefined", f.getBaseName(), ""

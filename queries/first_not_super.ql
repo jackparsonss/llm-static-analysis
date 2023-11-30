@@ -27,4 +27,4 @@ where
   (f.getBaseName() = "views.py" or f.getBaseName() = "simple.py") and
   call_to_super.getNode().getEnclosingModule().getFile().getBaseName() = f.getBaseName()
 select call_to_super.getNode(), "First argument to super() should be " + name + ".",
-  f.getBaseName(), "File Name"
+  f.getBaseName(), ""

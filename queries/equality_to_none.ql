@@ -22,4 +22,4 @@ where
     f.getBaseName() = "SipRequest.py"
   ) and
   c.getEnclosingModule().getFile().getBaseName() = f.getBaseName()
-select c, "Testing for None should use the 'is' operator.", f.getBaseName(), "File Name"
+select c, "Testing for None should use the 'is' operator.", f.getBaseName(), ""

@@ -83,16 +83,14 @@ def fix_codeql_problem(file_path, query_name, codeql_results):
         content = file.read()
 
     prompt = f"""
-        The following input is a python file that I have run a codeql query against
-        that checks for {query_name}. This query returned this as the results \n
-        {codeql_results}\nYour task is to take this codeql results alongside the type 
-        of static analysis query I've run and fix this problem in the code. Do not modify,
-        refactor, or change any code that does not directly relate to the issue. Retain all logic
-        and output as is, do not rewrite any code even if it looks cleaner. Basically think of
-        yourself as an intern developer at a big technology company, you found the problem
-        and you don't want to break anything else so your only fixing the lines that directly
-        relate to the problem. Name your output key of the JSON response 'modified_python_file' 
-        and the value should be the python file, no nesting of JSON objects.
+        The following input is a Python file. I have run a CodeQL query that checks for {query_name}. 
+        The query results are as follows:\n
+        {codeql_results}\n
+        Your task is to make modifications to the code to fix the reported issues. Only modify the lines 
+        of code mentioned in the CodeQL results. Do not make any changes to other parts of the code, and 
+        avoid refactoring or rewriting, keep comments as well. Name your output key of the JSON response 'modified_python_file' 
+        and the value should be the python file, no nesting of JSON objects.Ensure that the output follows the same formatting 
+        and indentation conventions as the input code.
     """
     print("PROMPT:\n", prompt)
 
@@ -140,7 +138,7 @@ def read_file_content(file_path):
 def main():
     dataset = load_data()
     for row in dataset:
-        if row["code_file_path"] == "n9code/pylease/tests/test_ctxmgmt.py":
+        if row["code_file_path"] == "rcbops/glance-buildpackage/glance/tests/unit/test_db.py":
             create_codeql_database(move_file_to_directory(row["code_file_path"]))
 
             results = run_codeql_query(row["query_name"])

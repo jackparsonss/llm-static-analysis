@@ -132,6 +132,12 @@ where
     f.getBaseName() = "test_multinomial.py"
     or
     f.getBaseName() = "streamingExtensions.py"
+    or
+    f.getBaseName() = "llm_test_db.py"
+    or
+    f.getBaseName() = "llm_test_multinomial.py"
+    or
+    f.getBaseName() = "llm_streamingExtensions.py"
   ) and
   f.getBaseName() = s.getEnclosingModule().getFile().getBaseName()
-select s, "Import of '" + name.getId() + "' is not used.", f.getBaseName(), "File Name"
+select s, "Import of '" + name.getId() + "' is not used.", f.getBaseName(), ""
