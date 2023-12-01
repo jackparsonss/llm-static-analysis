@@ -21,7 +21,7 @@ def query(model, content, prompt):
             {"role": "user", "content": content},
         ],
     )
-
+    
     return json.loads(response.choices[0].message.content)["modified_python_file"]
 
 
@@ -32,12 +32,11 @@ def rank(model, original_file, modified_file, prompt):
         messages=[
             {
                 "role": "system",
-                "content": "You are a helpful assistant designed to output JSON.",
+                "content": "You are a helpful assistant designed to output JSON. Make sure no non terminated strings",
             },
             {"role": "user", "content": prompt},
             {"role": "user", "content": original_file},
             {"role": "user", "content": modified_file}
         ],
     )
-
     return json.loads(response.choices[0].message.content)["ranking"]

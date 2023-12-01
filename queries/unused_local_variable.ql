@@ -43,10 +43,10 @@ where
   unused_local(unused, v) and
   (
     f.getBaseName() = "test_ctxmgmt.py" or
-    f.getBaseName() = "lxc.py" or
+    f.getBaseName() = "cached.py" or
     f.getBaseName() = "win_registry_key_object.py" or
     f.getBaseName() = "llm_test_ctxmgmt.py" or
-    f.getBaseName() = "llm_lxc.py" or
+    f.getBaseName() = "llm_cached.py" or
     f.getBaseName() = "llm_win_registry_key_object.py"
   ) and
   v.getScope().getEnclosingModule().getFile().getBaseName() = f.getBaseName() and

@@ -20,7 +20,8 @@ def filter(row):
     name = row["query_name"]
     is_valid = name in valid_queries
 
-    if not is_valid:
+
+    if not is_valid or row["code_file_path"] == "saltstack/salt/salt/modules/lxc.py" or row["code_file_path"] == "pydata/pandas/pandas/stats/plm.py":
         return False
 
     # remove dups

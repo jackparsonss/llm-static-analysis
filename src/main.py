@@ -11,6 +11,7 @@ import difflib
 from datetime import datetime
 import os
 import time
+import tiktoken
 
 arg_mapping = {"gpt-3.5": "gpt-3.5-turbo-1106", "gpt-4": "gpt-4-1106-preview"}
 
@@ -142,7 +143,8 @@ def run_codeql_query(query_filename):
 
 
 def rank_llm_output(
-    file_path, file_path_original, file_path_modified, query_name, codeql_results
+    file_path, file_path_original, file_path_modified, query_name,
+    results
 ):
     with open(file_path_original, "r", encoding="utf-8") as file:
         original_file = file.read()
@@ -184,23 +186,32 @@ def rank_llm_output(
     The following is the original file and the modified file with the fix to the problem.
     Output only the reason and score for the patch below. Do not output anything else.
     Name your output key of the JSON response 'ranking' and the value should be a string
-    of just the integer score
+    of just the integer score and the reason for the score.
+    Make sure there are no unterminated strings since I will be calling 
+    return json.loads(response.choices[0].message.content)["ranking"]
+    on your response
     """
 
-    print("PROMPT:\n", prompt)
+    # print("PROMPT:\n", prompt)
     print("Sending Prompt to LLM...")
 
     ranking = rank(arg_mapping[args.test_llm], original_file, modified_file, prompt)
+    time.sleep(60)
+
     # write output to filepath .txt
     with open(file_path + '/ranking.txt', "w", encoding="utf-8") as file:
         file.write(ranking)
+    
+    with open(file_path + '/query_results.txt', "w", encoding="utf-8") as file:
+        file.write("Static Analysis Problem: " + query_name + "\n")
+        file.write(results)
+        
 
 
 def fix_codeql_problem(file_path, query_name, codeql_results):
     with open(file_path, "r", encoding="utf-8") as file:
         content = file.read()
 
-    # STILL NEED TO MAYBE GIVE IT LINES OF INTEREST??
     prompt = f"""
         We are fixing code that has been flagged for the CodeQL warning titled "{query_name}" 
         which has the following description: \n {query_descriptions[query_name]} \n
@@ -215,13 +226,17 @@ def fix_codeql_problem(file_path, query_name, codeql_results):
         The following input is the Python file containing the buggy code.
 
         Name your output key of the JSON response 'modified_python_file' and the value should be the 
-        python file, no nesting of JSON objects. Ensure that the output follows the same formatting 
-        and indentation conventions as the input code.
+        python file, no nesting of JSON objects. Output full code.
+        Make sure there are no unterminated strings since I will be calling 
+        json.loads(response.choices[0].message.content)["modified_python_file"] on your response
+        Ensure that the output follows 
+        the same formatting and indentation conventions as the input code.
     """
-    print("PROMPT:\n", prompt)
+    # print("PROMPT:\n", prompt)
 
     print("Sending Prompt to LLM...")
     modified_python_file = query(arg_mapping[args.test_llm], content, prompt)
+    time.sleep(60)
 
     # Make directory to put new files
     original_filename = file_path.split("/")[-1]
@@ -237,15 +252,16 @@ def fix_codeql_problem(file_path, query_name, codeql_results):
     modified_python_file_content = read_file_content(new_filename)
     original_python_file_content = read_file_content(file_path)
 
+    # Copy original file into output folder
+    original_filename = shutil.copy(file_path, new_filepath)
+
     # Run Query to see if llm fixed problem
     create_codeql_database(new_filepath)
     results = run_codeql_query(query_name)
 
-    # Copy original file into output folder
-    original_filename = shutil.copy(file_path, new_filepath)
 
     rank_llm_output(
-        new_filepath, original_filename, new_filename, query_name, codeql_results
+        new_filepath, original_filename, new_filename, query_name, results
     )
 
     compare_content(original_python_file_content, modified_python_file_content, new_filepath)
@@ -270,7 +286,9 @@ def read_file_content(file_path):
 def main():
     dataset = load_data()
     for row in dataset:
-        if row["code_file_path"] == "bayespy/bayespy/bayespy/inference/vmp/nodes/tests/test_multinomial.py":
+
+        if (row["code_file_path"] == 'VisTrails/VisTrails/vistrails/core/interpreter/cached.py'):
+
             create_codeql_database(move_file_to_directory(row["code_file_path"]))
 
             results = run_codeql_query(row["query_name"])
@@ -278,8 +296,9 @@ def main():
 
             fix_codeql_problem(
                 "./data/" + row["code_file_path"], row["query_name"], results
-            )
+        )
 
 
 if __name__ == "__main__":
     main()
+ 
