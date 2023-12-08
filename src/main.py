@@ -143,8 +143,7 @@ def run_codeql_query(query_filename):
 
 
 def rank_llm_output(
-    file_path, file_path_original, file_path_modified, query_name,
-    results
+    file_path, file_path_original, file_path_modified, query_name, results
 ):
     with open(file_path_original, "r", encoding="utf-8") as file:
         original_file = file.read()
@@ -199,13 +198,12 @@ def rank_llm_output(
     time.sleep(60)
 
     # write output to filepath .txt
-    with open(file_path + '/ranking.txt', "w", encoding="utf-8") as file:
+    with open(file_path + "/ranking.txt", "w", encoding="utf-8") as file:
         file.write(ranking)
-    
-    with open(file_path + '/query_results.txt', "w", encoding="utf-8") as file:
+
+    with open(file_path + "/query_results.txt", "w", encoding="utf-8") as file:
         file.write("Static Analysis Problem: " + query_name + "\n")
         file.write(results)
-        
 
 
 def fix_codeql_problem(file_path, query_name, codeql_results):
@@ -259,12 +257,11 @@ def fix_codeql_problem(file_path, query_name, codeql_results):
     create_codeql_database(new_filepath)
     results = run_codeql_query(query_name)
 
+    rank_llm_output(new_filepath, original_filename, new_filename, query_name, results)
 
-    rank_llm_output(
-        new_filepath, original_filename, new_filename, query_name, results
+    compare_content(
+        original_python_file_content, modified_python_file_content, new_filepath
     )
-
-    compare_content(original_python_file_content, modified_python_file_content, new_filepath)
 
     return results
 
@@ -273,7 +270,7 @@ def compare_content(original_content, modified_content, file_path):
     d = difflib.Differ()
     diff = d.compare(original_content, modified_content)
     difference = "\n".join(diff)
-    with open(file_path + '/difference.txt', "w", encoding="utf-8") as file:
+    with open(file_path + "/difference.txt", "w", encoding="utf-8") as file:
         file.write(difference)
 
 
@@ -286,19 +283,13 @@ def read_file_content(file_path):
 def main():
     dataset = load_data()
     for row in dataset:
+        results = run_codeql_query(row["query_name"])
+        shutil.rmtree("./temp")
 
-        if (row["code_file_path"] == 'VisTrails/VisTrails/vistrails/core/interpreter/cached.py'):
-
-            create_codeql_database(move_file_to_directory(row["code_file_path"]))
-
-            results = run_codeql_query(row["query_name"])
-            shutil.rmtree("./temp")
-
-            fix_codeql_problem(
-                "./data/" + row["code_file_path"], row["query_name"], results
+        fix_codeql_problem(
+            "./data/" + row["code_file_path"], row["query_name"], results
         )
 
 
 if __name__ == "__main__":
     main()
- 
